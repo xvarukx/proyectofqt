@@ -1,0 +1,92 @@
+<%= form_for(@team) do |f| %>
+  <% if @team.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@team.errors.count, "error") %> prohibited this team from being saved:</h2>
+
+      <ul>
+      <% @team.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :name %><br>
+    <%= f.text_field :name , class: 'form-control'%>
+  </div>
+  <div class="form-group">
+    <%= f.label :user_id %><br>
+    <%= select_tag :user_ids, options_for_select(User.list_of_users),{class: 'form-control',include_blank: true} %>
+  </div>
+  <div class="form-group" id="wrapper-users">
+  <%= select_tag 'user_ids[]' , options_for_select([]), size: 10 %>
+  </div>
+  <div class="form-group">
+    <%= f.submit 'Enviar', class: 'btn btn-primary'%>
+    <%= link_to 'Back', teams_path, class: 'btn btn-default' %>
+  </div>
+
+  <input type="hiden" name="team_user_ids" id="team-user-ids">
+
+<% end %>
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+    var $wrapperUsers = $('#wrapper-users');
+    var $selectUsers = $wrapperUsers.find('select');
+    var $userId = $('#user_ids');
+    var $teamUserId = $('#team-user-ids');
+    var arrayUserIds = [];
+    var $form = $('#form-task').find('form');
+
+    $selectUsers.addClass('form-control');
+
+    $userId.on('change', handleTeams);
+    $userId.change().addClass('form-control');
+    $selectUsers.on('dblclick', handleUser);
+    $form.on('submit', handleSubmit);
+    
+
+    function handleSubmit(){
+      $teamUserId.val(arrayUserIds.join(','));
+      $(this)[0].submit();
+    }
+
+    function handleTeams(){
+      var userId = parseInt($(this).val());
+      var index = $(this).prop('selectedIndex');
+      var id = $(this).find('option:selected').attr('value');
+      var value = $(this).find('option:selected').text();
+     
+
+      if (index === 0) {
+          return;
+      }
+
+      $selectUsers.append('<option value ='+id+'>'+value+'</option>');
+      arrayUserIds.push(id);
+      $(this).find('option:selected').remove();
+
+    }
+
+    function handleUser(){
+      var $option = $(this).find('option:selected');
+      var id = $option.attr('value'); 
+      var value = $option.text();
+      var index = arrayUserIds.indexOf(id);
+
+      $userId.append($option);
+      arrayUserIds.splice(index,1);
+      $userId.prop('selectedIndex',0);
+
+    }
+
+
+
+
+  });
+  
+  
+</script>

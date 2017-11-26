@@ -1,0 +1,21 @@
+<header>
+<nav class="navbar navbar-default">
+      <div class="container-fluid">
+         <div class="navbar-header">
+            <a class="navbar-brand" href="/welcome/index">FQT DP TI</a>
+         </div>
+       <ul class="nav navbar-nav">
+          <li ><a href="/welcome/index">Home</a></li>
+          <li class='nav-option'><%=link_to 'Tareas',tasks_path%></li>
+          <li class='nav-option'><%=link_to 'Equipos',teams_path%></li>
+          <li class='nav-option'><%=link_to 'Zonas',zones_path%></li>
+          <li class='nav-option'><%=link_to 'Escuelas',schools_path%></li> 
+          <%if user_signed_in? %>
+            <li>
+              <%= link_to "Cerrar sesión", destroy_user_session_path, method: :delete %>
+            </li>
+          <%end%>
+        </ul>
+      </div>
+</nav>
+</header>

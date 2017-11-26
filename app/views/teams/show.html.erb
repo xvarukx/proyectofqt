@@ -1,0 +1,23 @@
+<p id="notice"><%= notice %></p>
+
+<H3>
+  <strong>Equipo:</strong>
+  <%= @team.name %>
+</h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Usuarios</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @team.users.each do |user| %>
+      <tr>
+        <td><%= user.email %></td>        
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to 'Edit', edit_team_path(@team), class: 'btn btn-default' %>
+<%= link_to 'Back', teams_path, class: 'btn btn-default' %>

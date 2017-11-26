@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <link rel="icon" href="/assets/calendar.ico" />
+  <title>ProyectoFQT</title>
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= csrf_meta_tags %>
+</head>
+
+<body>
+<div id="sideNavigation" class="sidenav">
+  <%if user_signed_in? and current_user.avatar %>
+    <div class="round-image-50"><%= image_tag(current_user.avatar.url(:thumb)) %></div>
+    <div class="user-email"><%= current_user.email %></div>
+  <%end%>
+  <a href="javascript:void(0)" class="btn-close">&times;</a>
+  <a href="/home" ><img src="/assets/home.png"/>Home</a>
+   <%if user_signed_in? %>
+      <%= link_to calendar_path do %>
+        <%= image_tag 'Date.png', alt: ''%>Calendario
+      <%end%>
+      <%= link_to tasks_path do %>
+        <%= image_tag 'task.png', alt: ''%>Tareas
+      <%end%>
+      <%= link_to teams_path do %>
+        <%= image_tag 'team.png', alt: ''%>Equipos
+      <%end%>
+      <%= link_to zones_path do %>
+        <%= image_tag 'zones.png', alt: ''%>Zonas
+      <%end%>
+      <%= link_to schools_path do %>
+        <%= image_tag 'schools.png', alt: ''%>Escuelas
+      <%end%>
+      <%= link_to destroy_user_session_path, :method => :delete do %>
+        <%= image_tag 'close.png', alt: ''%>Cerrar sesión
+      <%end%>
+    <%else%>
+      <%= link_to new_user_session_path do %>
+        <%= image_tag 'user.png', alt: ''%>Iniciar sesión
+      <%end%>
+      <%= link_to new_user_registration_path do %>
+        <%= image_tag 'close.png', alt: ''%>Registrarse
+      <%end%>
+      
+    <%end%>
+</div>
+
+<nav class="topnav">
+  <a href="#" >
+
+    <svg width="30" height="30" id="icoOpen">
+        <path  d="M0,5 30,5" stroke="#CEEEB7" stroke-width="5"/>
+        <path d="M0,14 30,14" stroke="#CEEEB7" stroke-width="5"/>
+        <path d="M0,23 30,23" stroke="#CEEEB7" stroke-width="5"/>
+    </svg>
+  </a>
+</nav>
+ 
+<div id="main">
+  <%= yield %> 
+</div>
+</header>
+<p class="notice hide"><%= notice %></p>
+  <p class="alert hide"><%= alert %></p>
+
+
+<script>
+$(document).ready(function() {
+  $('.topnav a').click(function(event){
+    event.preventDefault();
+    $('#sideNavigation').css("width","250px");
+    $("#main").css("margin-left","250px");
+
+  });
+   
+  $('.btn-close').click(function(){
+    $('#sideNavigation').css("width","0");
+    $("#main").css("margin-left","0");
+});
+});
+</script>
+
+<style type="text/css">
+  .sidenav {
+    height: 100%; /* 100% Full-height */
+    width: 0; /* 0 width - change this with JavaScript */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Stay on top */
+    top: 0;
+    left: 0;
+    background-color: #26963D; /* Black*/
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 60px; /* Place content 60px from the top */
+    transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+}
+
+ 
+
+/* The navigation menu links */
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #CEEEB7;
+    display: block;
+    transition: 0.3s
+}
+ 
+/* When you mouse over the navigation links, change their color */
+
+ 
+/* Position and style the close button (top right corner) */
+.sidenav .btn-close {
+    position: absolute;
+    top: 0;
+    font-size: 36px;
+    margin-left: 180px;
+}
+ 
+/* Style page content - use this if you want to push the page content to the right when you open the side navigation */
+#main {
+    transition: margin-left .5s;
+    padding: 20px;
+    overflow:hidden;
+    width:100%;
+}
+body {
+  overflow-x: hidden;
+}
+ 
+/* Add a black background color to the top navigation */
+.topnav {
+    background-color: #007A3A;
+    overflow: hidden;
+}
+ 
+/* Style the links inside the navigation bar */
+.topnav a {
+    float: left;
+    display: block;
+    color: #CEEEB7;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+}
+ 
+/* Change the color of links on hover */
+
+ 
+/* Add a color to the active/current link */
+.topnav a.active {
+    background-color: #f2f2f2;
+    color: white;
+}
+.sidenav a:hover{
+  background-color: #114122;
+
+}
+.btn-close:hover{
+  background-color: transparent !important;
+  color: #114122;
+
+} 
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+}
+ 
+a svg{
+  transition:all .5s ease;
+ 
+  
+}
+ 
+#ico{
+  
+}
+ 
+.menu{
+  background: #26963D;
+  display: none;
+  padding: 5px;
+  width: 320px;
+  @include border-radius(5px);
+ 
+  #transition: all 0.5s ease;
+ 
+  a{
+    display: block;
+    color: red;
+    text-align: center;
+    padding: 10px 2px;
+    margin: 3px 0;
+    text-decoration: none;
+    background: #26963D;
+ 
+    &:nth-child(1){
+      margin-top: 0;
+      @include border-radius(3px 3px 0 0 );
+    }
+    &:nth-child(5){
+      margin-bottom: 0;
+      @include border-radius(0 0 3px 3px);
+    }
+ 
+   
+    }
+  }
+}
+</style>

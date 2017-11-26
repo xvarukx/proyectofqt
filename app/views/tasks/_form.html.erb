@@ -1,0 +1,104 @@
+<%= form_for(@task) do |f| %>
+  <% if @task.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@task.errors.count, "error") %> prohibited this task from being saved:</h2>
+
+      <ul>
+      <% @task.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :description %><br>
+    <%= f.text_field :description, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :state %><br>
+     <%= f.select :state, [['Sin Empezar','Sin Empezar'],['En Proceso','En Proceso'],['Terminada','Terminada']],{},{ :class => 'form-control'} %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :task_date %><br>
+    <%= f.date_select :task_date %>
+  </div>
+
+   <div class="form-group">
+    <%= label_tag 'Zonas:' %><br>
+    <%if @task.schools.count > 0 %>
+    <%= select_tag :zone_id,options_for_select(Zone.list_of_zones, @task.schools.first.zone_id), include_blank:true%>
+    <%else%>
+    <%= select_tag :zone_id,options_for_select(Zone.list_of_zones, []),include_blank: true %>
+    <%end%>
+  </div>
+   <div class="form-group hide" id="wrapper-schools">
+  <%= select_tag 'task[school_ids][]', options_for_select(School.list_of_schools, @task.school_ids), multiple: true, size: 5 %>
+  </div>
+  
+  <div class="form-group">
+    <%= f.label :team_id %><br>
+    <%= f.select :team_id, Team.list_of_teams,{},{class: 'form-control'} %>
+  </div>
+  <div class="form-group" >
+    <%= f.submit 'Enviar', class: 'btn btn-primary' %>
+    <%= link_to 'Volver', tasks_path, class: 'btn btn-default' %>
+  </div>
+<% end %>
+<div id="list-schools" class="hide" data-schools="<%=@schools.to_json%>"></div>
+<div id="selected-schools" class="hide" data-selected-schools="<%=@task.school_ids.to_json%>"></div>
+
+
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+
+    var schools = JSON.parse($('#list-schools').attr('data-schools'));
+    var selectedSchools = JSON.parse($('#selected-schools').attr('data-selected-schools'));
+    var url = location.href;
+    var $wrapperSchools = $('#wrapper-schools');
+    var $selectSchools = $wrapperSchools.find('select');
+    var $zoneId = $('#zone_id');
+    $selectSchools.addClass('form-control');
+
+    if (url.indexOf('edit') > -1){
+      $wrapperSchools.removeClass('hide');
+    }
+
+    $zoneId.on('change', handleZones);
+    $zoneId.change().addClass('form-control');
+
+    function handleZones(){
+      var zoneId = parseInt($(this).val());
+      var index = $(this).prop('selectedIndex');
+
+      if (index === 0) {
+        $wrapperSchools.addClass('hide');
+        return;
+      }
+
+      $selectSchools.children().remove();
+
+      schools.map(function(each){
+        if (zoneId === each.zone_id) {
+
+          if (selectedSchools.indexOf(each.id) > -1) {
+            $selectSchools.append('<option selected="true" value ='+each.id+'>'+each.name+'</option>');
+          }else{
+            $selectSchools.append('<option value ='+each.id+'>'+each.name+'</option>');
+          }
+        }
+        
+      });
+
+      $wrapperSchools.removeClass('hide');
+
+    }
+
+  });
+  
+  
+</script>

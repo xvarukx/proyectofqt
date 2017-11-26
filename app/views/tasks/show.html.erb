@@ -1,0 +1,56 @@
+<p id="notice"><%= notice %></p>
+
+<h3>
+  <strong>Descripcion:</strong>
+  <%= @task.description %>
+</h3>
+
+<div class="padding-left-10">
+<p>
+  <strong>Estado:</strong>
+  <%= @task.state %>
+</p>
+
+<p>
+  <strong>Fecha:</strong>
+  <%= @task.task_date %>
+</p>
+
+<p>
+  <strong>Equipo:</strong>
+  <%= @task.team.name %>
+</p>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Escuela</th>
+      <th>Zona</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @task.schools.each do |school| %>
+      <tr>
+        <td><%= school.name %></td>
+        <td><%= school.zone.name %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Usuarios</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @task.team.users.each do |user| %>
+      <tr>
+        <td><%= user.email %></td>        
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to 'Edit', edit_task_path(@task), class: 'btn btn-default'  %>
+<%= link_to 'Back', tasks_path, class: 'btn btn-default'  %>

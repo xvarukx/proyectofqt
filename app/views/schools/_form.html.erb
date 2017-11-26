@@ -1,0 +1,26 @@
+<%= form_for(@school) do |f| %>
+  <% if @school.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@school.errors.count, "error") %> prohibited this school from being saved:</h2>
+
+      <ul>
+      <% @school.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class='form-group'>
+    <%= f.label :name %><br>
+    <%= f.text_field :name, class: 'form-control' %>
+  </div>
+  <div class='form-group'>
+    <%= f.label :zone_id %><br>
+    <%= f.select :zone_id, Zone.list_of_zones,{},{class: 'form-control'} %>
+  </div>
+  <div class='form-group'>
+    <%= f.submit 'Enviar', class: 'btn btn-primary' %>
+    <%= link_to 'Volver', schools_path, class: 'btn btn-default' %>
+  </div>
+<% end %>

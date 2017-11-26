@@ -1,0 +1,207 @@
+<%= search_form_for @search, url: calendar_path, method: :get do |f| %>
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="row search-date">
+          <div class="col-sm-6"> 
+            <%= select_tag :month, options_for_select(@months_range, selected: params[:month]), include_blank: true , class: 'form-control input-sm' %>
+          </div>
+           <div class="col-sm-6"> 
+            <%= select_tag :year, options_for_select(@years_range, selected: params[:year]), include_blank: true, class: 'form-control input-sm' %>
+          </div>
+          <div class="col-sm-6"> 
+            <input class="show-filters" type="checkbox" name="vehicle" value="more-filters">Busqueda Avanzada
+          </div>
+        </div>
+
+        <div class="advance-search form-group hide">
+          <div class="row">
+           <div class="col-sm-3"> 
+            Usuarios:<%= f.select :team_users_id_eq, User.list_of_users,{include_blank: true} ,class: 'form-control input-sm users-list'  %>
+           
+              <input class="find-user-task" type="checkbox" data-current-user="<%= current_user.to_json%>" name="vehicle" value="current-user-task">Mis tareas
+           </div>
+           
+            <div class="col-sm-3"> 
+            Equipos: <%= f.select :team_id_eq, Team.list_of_teams ,{include_blank: true},class: 'form-control input-sm'  %>
+            </div>
+            <div class="col-sm-3"> 
+             Estados:<%= f.select :state_eq, Task.list_of_states ,{include_blank: true},class: 'form-control input-sm'   %>
+            </div>
+            <div class="col-sm-3"> 
+             Zonas:<%= f.select :schools_zone_id_eq, Zone.list_of_zones ,{include_blank: true},class: 'form-control input-sm'   %>
+            </div>
+          </div>
+
+         <%= f.submit 'Buscar',class: 'btn btn-default'  %> 
+      </div>
+    </div>
+    </div>
+<% end %>
+<div id="availabilities-calendar">
+  <br/>
+  <h2 id="month">
+    <% #= link_to "&laquo;".html_safe, params.merge(date: @date.prev_month) %>
+    <%= @date.strftime("%B %Y") %>
+    <% #= link_to "&raquo;".html_safe, params.merge(date: @date.next_month) %>
+  </h2>
+  <%= ds_calendar @date do |date|     %>
+    <span>
+      <%= date.day %>
+    <div class="clear"></div>
+    <% if @tasks_by_date[date] %>
+      <div class="calendar-day">
+        <% @tasks_by_date[date].each do |task| %>
+          <div class="day" data-task="<%=task.to_json%>" data-users="<%=task.get_team_users%>" data-team-name="<%=task.team.name%>"  data-schools = "<%=task.schools.list_schools.to_json%>">
+            <%=task.description%>
+           </div>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+
+</div>
+<div id="popup" style="display: none;">
+    <div class="content-popup">
+        <div class="close">&times;</div>
+        <div>
+           <h2 id="title-pop">Contenido POPUP</h2>
+            <div class="general-body-pop"></div>
+            <div class="schools-body-pop"></div>
+            <div class="avatars-body-pop"></div>
+        </div>
+        <div class="status"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+  
+  var $currentTask = null;
+  var currentUser= JSON.parse($('.find-user-task').attr('data-current-user'));
+ 
+  $(document).ready(function() {
+    var maxHeight = 0;
+
+    $('#availabilities-calendar tr td').each(function(){
+       var thisH = $(this).height();
+       if (thisH > maxHeight) { maxHeight = thisH; }
+    });
+
+    $('#availabilities-calendar tr td').css('height', maxHeight);
+
+    $('.day').click(function(event) {
+      $currentTask = $(this);
+      var $day = $(this).html();
+      var dataTask = JSON.parse($(this).attr('data-task'));
+      var nameTeam = JSON.parse($(this).attr('data-team-name'));
+      var dataSchools = JSON.parse($(this).attr('data-schools'));
+      var dataUsers = JSON.parse($(this).attr('data-users'));
+
+      clearPop();
+      addGeneralInformationToPop(dataTask,nameTeam);
+      addAvatarsToPop(dataUsers);
+      addSchoolsToPop(dataSchools);
+      addStatusOptions(dataTask);
+
+      $('#popup').fadeIn('slow');
+      $('.popup-overlay').fadeIn('slow');
+      $('.popup-overlay').height($(window).height());
+      return false;
+    }); 
+    $('.close').click(function(){
+        $('#popup').fadeOut('slow');
+        $('.popup-overlay').fadeOut('slow');    
+        return false;
+    });
+    $('.show-filters').change(function(){
+        if( $(this).is(':checked')){
+          $('.advance-search').removeClass('hide');
+          
+        }else{
+          $('.advance-search').addClass('hide');
+        }
+    });
+    $('.find-user-task').change(function(){
+        if( $(this).is(':checked')){          
+           $('.users-list').val(currentUser.id);
+        }else{
+           $('.users-list').val('');
+        }
+    });
+  });
+
+  function clearPop(){
+    $('.general-body-pop').empty();
+    $('.schools-body-pop').empty();
+    $('.avatars-body-pop').empty();
+    $('.status').empty();
+  }
+
+  function addGeneralInformationToPop(dataTask,nameTeam){
+    var $generalBody = $('.general-body-pop');
+    var generalBody = 
+    "<div><strong>Fecha:</strong> "+dataTask.task_date+"</div>"+
+    "<div><strong>Estado:</strong><span class='status-label'>"+dataTask.state+"</span></div>"+
+    "<div><strong>Equipo:</strong> "+nameTeam+"</div>";
+
+    $('#title-pop').text(dataTask.description);
+    $generalBody.append(generalBody);
+  }
+
+  function addSchoolsToPop(dataSchools){
+    $('.schools-body-pop').append('<strong>Escuelas:</strong>')
+    dataSchools.map(function(each) {
+      $('.schools-body-pop').append("<div class='padding-left-10'>"+each.name+"</div>");
+    });
+  }
+
+  function addAvatarsToPop(dataUsers){
+    dataUsers.map(function(each) {
+        avatar = each.avatar
+        if(avatar==="/avatars/thumb/missing.png"){
+         avatar = "/assets/icons/Icon-user.png";
+    
+         }
+
+      $('.avatars-body-pop').append("<span class='user-image-50'><img title="+each.email+" src="+avatar+"/></span>");
+    });
+  }
+
+  function addStatusOptions(task){
+    var taskId = task.id;
+
+    var options = 
+      "<button class='btn-status status-null' data-task-id="+taskId+" data-status='null'>Sin Empezar</button>"+
+      "<button class='btn-status status-in-progress' data-task-id="+taskId+" data-status='progress'>En Proceso</button>"+
+      "<button class='btn-status status-finished' data-task-id="+taskId+" data-status='finished'>Terminada</button>";
+    $('.status').append(options);
+    switch(task.state){
+      case 'Sin Empezar': $('.status-null').addClass('current-status');break;
+      case 'En Proceso': $('.status-in-progress').addClass('current-status');break;
+      case 'Terminada': $('.status-finished').addClass('current-status'); break;
+    }
+    $('.btn-status').click(function(event) {
+      var taskId = $(this).attr('data-task-id');
+      var taskStatus = $(this).attr('data-status');
+      changeStatus(taskId,taskStatus,$(this));
+
+    });
+  }
+  
+  function changeStatus(taskId,taskStatus,button){
+    $.ajax({
+      url: '/task_update_status',
+      type: 'PUT',
+      data: {task_id: taskId ,task_status: taskStatus},
+      success: function(response){
+        button.siblings().addClass('btn-status-inactive').removeClass('current-status');
+        button.addClass('current-status');
+        $('.status-label').text(response.task.state);
+        $currentTask.attr('data-task',JSON.stringify(response.task));
+      },
+      error: function(){
+        alert("Error");
+      },
+    });
+  }
+
+</script>
